@@ -4,6 +4,6 @@
   export let data: PageData;
 </script>
 
-<h1>{data.id}</h1>
+<h1>{data.board.id}</h1>
 
-<h2>{data.name}</h2>
+<h2>{data.board.name}</h2>

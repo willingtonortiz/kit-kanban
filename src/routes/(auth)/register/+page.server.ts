@@ -1,14 +1,12 @@
 import { z } from 'zod';
 import { fail, redirect } from '@sveltejs/kit';
-import type { PageServerLoad, Action, Actions } from './$types';
-
-export const load: PageServerLoad = async () => {
-  return { hello: 'world' };
-};
+import bcrypt from 'bcrypt';
+import type { Action, Actions, PageServerLoad } from './$types';
+import { db } from '$lib/business/core/infrastructure/database';
 
 const ZRegister = z
   .object({
-    username: z.string().email(),
+    username: z.string().min(3).max(20),
     password: z.string().min(8),
     confirmPassword: z.string().min(8),
   })
@@ -21,6 +19,12 @@ const ZRegister = z
     }
   });
 
+export const load: PageServerLoad = async ({ locals }) => {
+  if (locals.user) {
+    throw redirect(302, '/boards');
+  }
+};
+
 const register: Action = async ({ request }) => {
   const formData = await request.formData();
   const data = Object.fromEntries(formData.entries());
@@ -32,7 +36,26 @@ const register: Action = async ({ request }) => {
     return fail(400, { fieldErrors, formErrors });
   }
 
-  const { username, password, confirmPassword } = parseResult.data;
+  const { username, password } = parseResult.data;
+
+  const foundUser = await db.user.findUnique({ where: { username } });
+  if (foundUser) {
+    return fail(400, {
+      formErrors: ['User already exists'],
+    });
+  }
+
+  await db.user.create({
+    data: {
+      username,
+      passwordHash: await bcrypt.hash(password, 10),
+      userAuthToken: crypto.randomUUID(),
+      role: {
+        connect: { name: 'USER' },
+      },
+    },
+  });
+
   throw redirect(303, '/login');
 };
 
