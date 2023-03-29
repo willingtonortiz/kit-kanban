@@ -1,7 +1,7 @@
 import { redirect } from '@sveltejs/kit';
-import type { Actions, PageServerLoad } from './$types';
+import type { Actions } from './$types';
 
-export const load: PageServerLoad = async () => {
+export const load = async () => {
   throw redirect(302, '/boards');
 };
 

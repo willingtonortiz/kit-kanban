@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { fail, redirect } from '@sveltejs/kit';
 import bcrypt from 'bcrypt';
-import type { Action, Actions, PageServerLoad } from './$types';
+import type { Action, Actions } from './$types';
 import { db } from '$lib/business/core/infrastructure/database';
 
 const ZRegister = z
@@ -19,7 +19,7 @@ const ZRegister = z
     }
   });
 
-export const load: PageServerLoad = async ({ locals }) => {
+export const load = async ({ locals }) => {
   if (locals.user) {
     throw redirect(302, '/boards');
   }
