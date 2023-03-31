@@ -1,7 +1,7 @@
 import { db } from '$lib/business/core/infrastructure/database';
 import { redirect } from '@sveltejs/kit';
 
-export const load = async ({ cookies }) => {
+export async function load({ cookies }) {
   const userAuthToken = cookies.get('session');
 
   if (!userAuthToken) {
@@ -16,4 +16,4 @@ export const load = async ({ cookies }) => {
   const boards = await db.board.findMany({ where: { ownerId: user.id } });
 
   return { boards };
-};
+}

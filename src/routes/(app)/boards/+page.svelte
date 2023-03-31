@@ -1,7 +1,5 @@
 <script lang="ts">
-  import type { PageData } from './$types';
-
-  export let data: PageData;
+  export let data;
 </script>
 
 <div class="h-full px-8 pt-8 flex flex-row flex-nowrap gap-4">
@@ -44,17 +42,25 @@
 
   <div class="flex flex-row flex-wrap gap-3 justify-start content-start items-start">
     {#each data.boards as board}
-      <a href="/boards/{board.id}" class="w-[200px] h-24 p-2 rounded-sm bg-red-300">
-        <h3 class="text-white font-bold">{board.name}</h3>
+      <a href="/boards/{board.id}" class="w-[200px] h-24 rounded-sm overflow-hidden grid">
+        <img
+          class="col-start-1 col-end-1 row-start-1 row-end-1 w-full h-full brightness-75 z-0"
+          alt={board.name}
+          src={board.imageUrl}
+        />
+
+        <div class="p-2 col-start-1 col-end-1 row-start-1 row-end-1 z-10">
+          <h3 class="text-white font-bold">{board.name}</h3>
+        </div>
       </a>
     {/each}
 
     <a
       data-sveltekit-preload-data="off"
       href="/boards/new"
-      class="w-[200px] h-24 p-2 bg-appgray text-textgray rounded-sm"
+      class="w-[200px] h-24 p-2 grid place-items-center bg-appgray text-textgray rounded-sm"
     >
-      Crear un tablero nuevo
+      <p>Crear un tablero nuevo</p>
     </a>
   </div>
 </div>

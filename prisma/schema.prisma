@@ -8,13 +8,12 @@ datasource db {
 }
 
 model User {
-  id            String @id @default(uuid())
-  username      String @unique
+  id            String   @id @default(uuid())
+  username      String   @unique
   passwordHash  String
-  userAuthToken String @unique
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  userAuthToken String   @unique
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
   roleId Int
   role   Roles   @relation(fields: [roleId], references: [id])
@@ -28,12 +27,11 @@ model Roles {
 }
 
 model Board {
-  id   String @id @default(uuid())
-  name String
-
+  id        String   @id @default(uuid())
+  name      String
+  imageUrl  String   @default("https://trello-backgrounds.s3.amazonaws.com/SharedBackground/480x322/64ea0326504c970b5c6fd097fb62720e/photo-1535551951406-a19828b0a76b.jpg")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  ownerId String
-  owner   User   @relation(fields: [ownerId], references: [id])
+  ownerId   String
+  owner     User     @relation(fields: [ownerId], references: [id])
 }
