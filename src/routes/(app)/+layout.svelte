@@ -1,4 +1,4 @@
-<div class="h-screen grid grid-rows-layout">
+<div class="h-screen max-h-screen w-screen grid grid-rows-layout">
   <nav class="h-[44px] bg-primary flex flex-row items-center px-1 py-1.5 text-white">
     <ul>
       <li>
@@ -9,7 +9,7 @@
     </ul>
   </nav>
 
-  <main>
-    <slot />
-  </main>
+  <slot />
+
+  <div />
 </div>

@@ -14,10 +14,11 @@ model User {
   userAuthToken String   @unique
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
-
-  roleId Int
-  role   Roles   @relation(fields: [roleId], references: [id])
-  Board  Board[]
+  // Roles reference
+  roleId        Int
+  role          Roles    @relation(fields: [roleId], references: [id])
+  // Board reference
+  Board         Board[]
 }
 
 model Roles {
@@ -32,6 +33,33 @@ model Board {
   imageUrl  String   @default("https://trello-backgrounds.s3.amazonaws.com/SharedBackground/480x322/64ea0326504c970b5c6fd097fb62720e/photo-1535551951406-a19828b0a76b.jpg")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  // Owner reference
   ownerId   String
   owner     User     @relation(fields: [ownerId], references: [id])
+  // Lists reference
+  List      List[]
+}
+
+model List {
+  id        String   @id @default(uuid())
+  name      String
+  order     Float
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  // Board reference
+  boardId   String
+  board     Board    @relation(fields: [boardId], references: [id])
+  Task      Task[]
+}
+
+model Task {
+  id          String   @id @default(uuid())
+  name        String
+  description String
+  order       Float
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  // List reference
+  listId      String
+  list        List     @relation(fields: [listId], references: [id])
 }
