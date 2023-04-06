@@ -1,21 +1,6 @@
+import { fail } from '@sveltejs/kit';
 import { ZBoardId } from '$lib/business/board/domain/board';
 import { db } from '$lib/business/core/infrastructure/database';
-import { fail } from '@sveltejs/kit';
-
-export type List = {
-  id: string;
-  name: string;
-  order: number;
-  boardId: string;
-  Task: Task[];
-};
-
-export type Task = {
-  id: string;
-  name: string;
-  order: number;
-  listId: string;
-};
 
 export const load = async ({ params }) => {
   const boardId = ZBoardId.parse(params.boardId);
@@ -30,11 +15,18 @@ export const load = async ({ params }) => {
 
   const lists = await db.list.findMany({
     where: { boardId },
-    include: { Task: true },
+    orderBy: { order: 'asc' },
+    include: { Task: { orderBy: { order: 'asc' } } },
   });
 
   return {
     board,
-    lists,
+    lists: lists.map((list) => ({
+      id: list.id,
+      name: list.name,
+      boardId: list.boardId,
+      order: list.order,
+      tasks: list.Task,
+    })),
   };
 };

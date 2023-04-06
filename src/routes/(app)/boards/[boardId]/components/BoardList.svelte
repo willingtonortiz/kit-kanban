@@ -1,12 +1,16 @@
 <script lang="ts">
   import { dndzone, type DndEvent } from 'svelte-dnd-action';
+  import { createEventDispatcher } from 'svelte';
   import { flip } from 'svelte/animate';
   import type { List, Task } from '../+page.server';
+  import AddTask from './AddTask.svelte';
+
+  const dispatch = createEventDispatcher();
 
   const flipDurationMs = 200;
   export let initialData: List;
-  let serverItems = [...initialData.Task];
-  let currentItems = [...initialData.Task];
+  $: serverItems = [...initialData.Task];
+  $: currentItems = [...initialData.Task];
 
   function handleDndConsiderCards(e: CustomEvent<DndEvent<Task>>): void {
     currentItems = e.detail.items;
@@ -17,20 +21,24 @@
 
     // Check if an item was added, removed or removed
     if (currentItems.length > serverItems.length) {
-      // Item was added
-      const addedItem = currentItems.find((item) => !serverItems.includes(item));
-      console.log(`Added item in section ${initialData.id}`, addedItem);
-    } else if (currentItems.length < serverItems.length) {
-      // Item was removed
-      const removedItem = serverItems.find((item) => !currentItems.includes(item));
-      console.log(`Removed item in section ${initialData.id}`, removedItem);
-    } else {
-      // Item was moved
-      //   const movedItem = currentItems.find(item => item.id !== serverItems.find(serverItem => serverItem.id === item.id)?.id);
-      //   console.log('Moved item: ', movedItem);
+      // Item was added to list
+      const movedTask = currentItems.find((item) => !serverItems.includes(item));
+      dispatch('moveTaskToList', { taskId: movedTask?.id, listId: initialData.id });
+    } else if (currentItems.length === serverItems.length) {
+      // Item was reordered
+      // TODO: Implement this
     }
 
     serverItems = currentItems;
+  }
+
+  function onAddTask(event: CustomEvent<string>) {
+    const taskName = event.detail;
+    dispatch('addTask', { name: taskName, listId: initialData.id });
+  }
+
+  function onTaskClicked(taskId: string) {
+    dispatch('taskClicked', { taskId });
   }
 </script>
 
@@ -50,15 +58,17 @@
     on:consider={handleDndConsiderCards}
     on:finalize={handleDndFinalizeCards}
   >
-    {#each currentItems as item (item.id)}
-      <li
-        class="mr-1 p-2 rounded-sm bg-white text-sm shadow-sm"
-        animate:flip={{ duration: flipDurationMs }}
-      >
-        <p>{item.name}</p>
+    {#each currentItems as task (task.id)}
+      <li class="flex" animate:flip={{ duration: flipDurationMs }}>
+        <button
+          class="mr-1 p-2 flex-1 rounded-sm bg-white text-sm shadow-sm"
+          on:click={() => onTaskClicked(task.id)}
+        >
+          <p>{task.name}</p>
+        </button>
       </li>
     {/each}
   </ul>
 
-  <div>bottom</div>
+  <AddTask on:addTask={onAddTask} />
 </div>
